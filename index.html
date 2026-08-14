@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Daily Peace</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- BASE (LIGHT) THEME --- */
+        :root {
+            --text-main: #2d3748; 
+            --text-light: #4a5568; 
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --glass-border: rgba(255, 255, 255, 0.5); 
+            --accent: #2c5282;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #e2e8f0; 
+            background-image: url('https://images.unsplash.com/photo-1499002236242-d2cb948ebfdd?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover; background-position: center; background-attachment: fixed;
+            min-height: 100dvh; color: var(--text-main); display: flex; flex-direction: column; align-items: center; padding: 15px 15px 95px 15px;
+            transition: background-image 0.5s ease-in-out, background-color 0.5s ease;
+        }
+        .backdrop {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(247, 250, 252, 0.35); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 1;
+            transition: background 0.5s ease;
+        }
+        .view-container { position: relative; z-index: 2; width: 100%; max-width: 650px; display: flex; flex-direction: column; justify-content: flex-start; height: 100%; }
+        
+        /* Sections / Cards */
+        .section {
+            display: none; background: var(--card-bg); width: 100%; padding: 40px 25px; border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1); border: 1px solid var(--glass-border); text-align: center;
+            max-height: 88dvh; overflow-y: auto; animation: fadeIn 0.3s ease forwards; transition: background 0.5s ease, border-color 0.5s ease;
+        }
+        .section.active { display: block; }
+        .section::-webkit-scrollbar { width: 6px; } .section::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.15); border-radius: 10px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Typography */
+        h1 { font-family: 'Montserrat', sans-serif; font-weight: 300; font-size: 1.05rem; letter-spacing: 3px; text-transform: uppercase; color: var(--text-light); margin-bottom: 25px; transition: color 0.3s ease; }
+        h1::after { content: ''; display: block; width: 40px; height: 1px; background: var(--text-light); margin: 15px auto 0; opacity: 0.5; }
+        h2 { font-family: 'Montserrat', sans-serif; font-weight: 500; font-size: 0.95rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 15px; margin-top: 25px;}
+        
+        .serif-text { font-family: 'Cormorant Garamond', serif; font-size: 1.45rem; line-height: 1.6; }
+        .stanza { margin-bottom: 20px; }
+        p.subtitle { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; margin-bottom: 20px; font-style: italic; opacity: 0.8; }
+
+        /* Inputs & Buttons */
+        input[type="text"], input[type="password"], textarea, select {
+            width: 100%; padding: 12px; margin-bottom: 15px; border: none; border-bottom: 1px solid rgba(0,0,0,0.2); background: transparent;
+            font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; color: var(--text-main); outline: none; transition: border-color 0.3s, color 0.3s;
+        }
+        textarea { resize: vertical; min-height: 80px; }
+        input:focus, textarea:focus, select:focus { border-bottom: 1px solid var(--text-main); }
+        select { font-family: 'Montserrat', sans-serif; font-size: 1rem; cursor: pointer; }
+        option { background: #fff; color: #000; }
+        
+        button {
+            font-family: 'Montserrat', sans-serif; background: transparent; border: 1px solid var(--text-main); color: var(--text-main);
+            padding: 10px 18px; border-radius: 30px; cursor: pointer; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s; margin: 5px;
+        }
+        button:hover { background: var(--text-main); color: var(--card-bg); }
+        button.primary { background: var(--text-main); color: var(--card-bg); border-color: var(--text-main); }
+        button.primary:hover { background: var(--text-light); border-color: var(--text-light); }
+        .link-btn { font-family: 'Montserrat', sans-serif; font-size: 0.8rem; color: var(--accent); text-decoration: none; display: inline-block; margin: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 500;}
+
+        /* Toggles (Tabs inside Tabs) */
+        .toggle-container { display: flex; justify-content: center; margin-bottom: 20px; background: rgba(0,0,0,0.06); border-radius: 30px; padding: 4px; flex-wrap: wrap; transition: background 0.3s; }
+        .toggle-btn { flex: 1; border: none; margin: 0; padding: 10px 5px; border-radius: 25px; color: var(--text-light); font-weight: 500; font-size: 0.7rem; min-width: 70px; }
+        .toggle-btn:hover { background: transparent; color: var(--text-main); }
+        .toggle-btn.active { background: var(--text-main); color: var(--card-bg); }
+        .list-container { display: none; } .list-container.active { display: block; animation: fadeIn 0.3s ease; }
+
+        /* Lists & Sub-Cards */
+        .list-item { display: flex; align-items: center; margin-bottom: 15px; text-align: left; }
+        .list-item input[type="checkbox"] { margin-right: 15px; width: 22px; height: 22px; accent-color: var(--text-main); cursor: pointer;}
+        .list-item span { flex-grow: 1; font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; }
+        .list-item.done span { text-decoration: line-through; opacity: 0.5; }
+        .delete-btn { font-family: 'Montserrat', sans-serif; font-size: 1.2rem; cursor: pointer; opacity: 0.4; background: none; border: none; padding: 0 10px; }
+        
+        .card { background: rgba(255,255,255,0.6); border: 1px solid rgba(0,0,0,0.1); border-radius: 12px; padding: 20px; margin-bottom: 15px; text-align: left; transition: background 0.3s; }
+        .card h3 { font-family: 'Montserrat', sans-serif; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        
+        /* Accordions / Details */
+        .accordion { background: rgba(255,255,255,0.6); cursor: pointer; padding: 15px; width: 100%; text-align: left; border: none; outline: none; transition: 0.3s; font-family: 'Montserrat', sans-serif; font-weight: 500; font-size: 0.9rem; border-radius: 8px; margin-bottom: 5px; }
+        .accordion:hover { background: rgba(255,255,255,0.9); }
+        .panel { padding: 0 15px; background-color: transparent; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; text-align: left; margin-bottom: 10px;}
+        .panel p { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; margin: 10px 0; line-height: 1.5; }
+        summary::-webkit-details-marker { display: none; }
+
+        /* Timer & Breathe */
+        .timer-display { font-family: 'Cormorant Garamond', serif; font-size: 5.5rem; font-weight: 300; margin: 15px 0; font-variant-numeric: tabular-nums; }
+        .breathe-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 250px; }
+        .circle { width: 150px; height: 150px; border-radius: 50%; background: rgba(255, 255, 255, 0.4); border: 2px solid var(--glass-border); display: flex; justify-content: center; align-items: center; font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-style: italic; transition: all ease-in-out; }
+
+        /* Bottom Nav Bar */
+        .nav-bar {
+            position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255, 255, 255, 0.88); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border-top: 1px solid var(--glass-border); z-index: 10; display: flex; overflow-x: auto; padding: 10px 5px; scroll-behavior: smooth; transition: background 0.5s;
+        }
+        .nav-bar::-webkit-scrollbar { display: none; }
+        .nav-item {
+            flex: 0 0 auto; padding: 5px 12px; text-align: center; font-family: 'Montserrat', sans-serif; font-size: 0.65rem; color: var(--text-light); text-decoration: none; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 1px; display: flex; flex-direction: column; align-items: center; gap: 4px; opacity: 0.6; transition: opacity 0.3s, color 0.3s;
+        }
+        .nav-item span { font-size: 1.25rem; }
+        .nav-item.active { color: var(--text-main); font-weight: 600; opacity: 1; }
+
+        @media (max-width: 600px) {
+            .section { padding: 30px 20px; }
+            .serif-text { font-size: 1.3rem; }
+            .timer-display { font-size: 4.5rem; }
+            .toggle-btn { padding: 10px 2px; font-size: 0.65rem; }
+        }
+
+        /* --- DARK THEME --- */
+        body.dark-theme {
+            --text-main: #e2e8f0; 
+            --text-light: #a0aec0; 
+            --card-bg: rgba(26, 32, 44, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.1); 
+            --accent: #90cdf4;
+            background-color: #1a202c;
+            background-image: url('https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80');
+        }
+        body.dark-theme .backdrop { background: rgba(15, 20, 25, 0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        body.dark-theme .nav-bar { background: rgba(26, 32, 44, 0.95); }
+        body.dark-theme .card, body.dark-theme .accordion { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border); color: var(--text-main); }
+        body.dark-theme .accordion:hover { background: rgba(0, 0, 0, 0.5); }
+        body.dark-theme .toggle-container { background: rgba(0, 0, 0, 0.3); }
+        body.dark-theme .toggle-btn.active { background: var(--text-main); color: #1a202c; }
+        body.dark-theme option { background: #1a202c; color: var(--text-main); }
+        body.dark-theme .circle { background: rgba(255, 255, 255, 0.1); }
+        body.dark-theme input[type="text"], body.dark-theme input[type="password"], body.dark-theme textarea, body.dark-theme select { border-bottom: 1px solid rgba(255,255,255,0.2); }
+
+        /* --- WOOD THEME (Gold & Red) --- */
+        body.wood-theme {
+            --text-main: #e5c378; /* Gold */
+            --text-light: #e04a4a; /* Red */
+            --card-bg: rgba(30, 15, 0, 0.92);
+            --glass-border: rgba(229, 195, 120, 0.2); /* Gold trim */
+            --accent: #e04a4a;
+            background-color: #2b1700;
+            background-image: url('https://images.unsplash.com/photo-1550684376-efcbd6e3f031?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80'); /* Dark elegant wood texture */
+        }
+        body.wood-theme .backdrop { background: rgba(10, 5, 0, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+        body.wood-theme .nav-bar { background: rgba(30, 15, 0, 0.95); }
+        body.wood-theme .card, body.wood-theme .accordion { background: rgba(0, 0, 0, 0.5); border: 1px solid var(--glass-border); color: var(--text-main); }
+        body.wood-theme .accordion:hover { background: rgba(0, 0, 0, 0.7); }
+        body.wood-theme .toggle-container { background: rgba(0, 0, 0, 0.5); }
+        body.wood-theme .toggle-btn.active { background: var(--text-main); color: #2b1700; }
+        body.wood-theme option { background: #2b1700; color: #e5c378; }
+        body.wood-theme input[type="text"], body.wood-theme input[type="password"], body.wood-theme textarea, body.wood-theme select { border-bottom: 1px solid rgba(229, 195, 120, 0.3); }
+        body.wood-theme button { border-color: var(--text-main); color: var(--text-main); }
+        body.wood-theme button:hover { background: var(--text-main); color: #2b1700; }
+        body.wood-theme button.primary { background: var(--text-light); color: #fff; border-color: var(--text-light); }
+        body.wood-theme button.primary:hover { background: #b03030; border-color: #b03030; color: #fff; }
+        body.wood-theme input[type="checkbox"] { accent-color: var(--text-light); }
+        body.wood-theme .circle { background: rgba(229, 195, 120, 0.1); }
+    </style>
+</head>
+<body>
+    <div class="backdrop"></div>
+
+    <div class="view-container">
+        
+        <!-- 1. HOME -->
+        <main id="view-home" class="section active">
+            <h1>St. Francis Prayer</h1>
+            <div class="serif-text">
+                <div class="stanza">
+                    Lord, make me an instrument of your peace.<br>
+                    Where there is hatred, let me bring love.<br>
+                    Where there is offence, let me bring pardon.<br>
+                    Where there is discord, let me bring union.<br>
+                    Where there is error, let me bring truth.<br>
+                    Where there is doubt, let me bring faith.<br>
+                    Where there is despair, let me bring hope.<br>
+                    Where there is darkness, let me bring your light.<br>
+                    Where there is sadness, let me bring joy.
+                </div>
+                <div class="stanza">
+                    O Lord, grant that I may not so much seek<br>
+                    to be consoled as to console,<br>
+                    to be understood as to understand,<br>
+                    to be loved as to love,
+                </div>
+                <div class="stanza">
+                    for it is in giving that one receives,<br>
+                    it is in self-forgetting that one finds,<br>
+                    it is in forgiving that one is forgiven,<br>
+                    it is in dying that one awakens to eternal life.
+                </div>
+            </div>
+        </main>
+
+        <!-- 2. VERSE -->
+        <main id="view-verse" class="section">
+            <h1>Daily Light</h1>
+            <div class="toggle-container">
+                <button class="toggle-btn active" id="tab-v-generate" onclick="switchTab('v', 'generate')">Generate Verse</button>
+                <button class="toggle-btn" id="tab-v-search" onclick="switchTab('v', 'search')">Search</button>
+            </div>
+            
+            <div id="v-generate" class="list-container active">
+                <select id="verse-book">
+                    <option value="Psalms">Psalms</option>
+                    <option value="Proverbs">Proverbs</option>
+                    <option value="OT">Old Testament</option>
+                    <option value="NT">New Testament</option>
+                </select>
+                <button class="primary" onclick="generateRandomVerse()">New Verse</button>
+            </div>
+            
+            <div id="v-search" class="list-container">
+                <input type="text" id="verse-ai-prompt" placeholder="Search for verse about (e.g., anxiety)..." onkeypress="if(event.key==='Enter') generateAIVerse()">
+                <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+                    <button class="primary" onclick="generateAIVerse()">AI Search</button>
+                    <button onclick="searchGoogleVerse()">Google Search</button>
+                </div>
+                <p id="verse-api-warning" style="font-size: 0.75rem; color: var(--text-light); margin-top: 10px; display: none;">*AI Search requires a Gemini API Key in Settings.</p>
+            </div>
+            
+            <div class="serif-text" style="margin: 25px 0;">
+                <em id="verse-text">Select an option to draw a verse.</em>
+                <div id="verse-ref" style="margin-top: 10px; font-family: 'Montserrat', sans-serif; font-size: 0.8rem; text-transform: uppercase; font-weight: 600;"></div>
+            </div>
+            <div style="margin-top: 15px;" id="verse-link-container"></div>
+        </main>
+
+        <!-- 3. DAILY READING -->
+        <main id="view-readings" class="section">
+            <h1>Daily Reading</h1>
+            <div class="toggle-container">
+                <button class="toggle-btn active" id="tab-readings-biblereading" onclick="switchTab('readings', 'biblereading')">Bible Tracker</button>
+                <button class="toggle-btn" id="tab-readings-devotional" onclick="switchTab('readings', 'devotional')">Devotional</button>
+            </div>
+
+            <div id="readings-biblereading" class="list-container active">
+                <div class="card" style="background: rgba(44, 82, 130, 0.05);">
+                    <h3>Recommended 365-Day Plan (OSB)</h3>
+                    <p class="serif-text" id="daily-plan-text" style="font-size:1.3rem; margin-bottom:10px;">Genesis 1-3</p>
+                    <a href="#" id="daily-plan-link" target="_blank" class="link-btn">Read on Bible Gateway (NRSVCE)</a>
+                </div>
+                <h2>Progress Tracker</h2>
+                <button class="accordion">Old Testament</button>
+                <div class="panel" id="ot-tracker"></div>
+                <button class="accordion">Deuterocanonicals</button>
+                <div class="panel" id="dc-tracker"></div>
+                <button class="accordion">New Testament</button>
+                <div class="panel" id="nt-tracker"></div>
+            </div>
+
+            <div id="readings-devotional" class="list-container">
+                <div class="card" style="text-align: center;">
+                    <h3>Recommended Daily Reading</h3>
+                    <p class="serif-text" style="font-size:1.3rem;"><em>Day by Day: A 365 Day Devotional</em><br><span style="font-size:1rem;">(Trans. Natalia Hawthorne)</span></p>
+                    <a href="https://www.amazon.com/dp/B0H24962CK" target="_blank" class="link-btn">Get Kindle Edition</a><br>
+                    <a href="https://www.google.com/search?q=free+daily+christian+devotional" target="_blank" class="link-btn" style="color:var(--text-light); font-size:0.7rem;">Search Online Devotionals</a>
+                </div>
+                <h2>Companion Journal</h2>
+                <div style="text-align:left;">
+                    <p class="serif-text" id="devo-date" style="font-weight:bold; margin-bottom:10px;"></p>
+                    <textarea id="devo-quote" placeholder="Standout Quote or Scripture..." style="min-height:50px;"></textarea>
+                    <textarea id="devo-reflect" placeholder="My Reflection..."></textarea>
+                    <textarea id="devo-apply" placeholder="Application for today..." style="min-height:50px;"></textarea>
+                    <button class="primary" onclick="saveDevo()">Save Journal Entry</button>
+                    <button onclick="viewDevoArchive()">View Archive</button>
+                </div>
+                <div id="devo-archive-list" style="margin-top:20px; text-align:left; display:none;"></div>
+            </div>
+        </main>
+
+        <!-- 4. PRAYER BOOK -->
+        <main id="view-prayerbook" class="section">
+            <h1>Prayer Book</h1>
+            
+            <div class="toggle-container">
+                <button class="toggle-btn active" id="tab-pb-savedprayers" onclick="switchTab('pb', 'savedprayers')">My Prayers</button>
+                <button class="toggle-btn" id="tab-pb-prayerrules" onclick="switchTab('pb', 'prayerrules')">Prayer Rules</button>
+                <button class="toggle-btn" id="tab-pb-addprayer" onclick="switchTab('pb', 'addprayer')">Add Manually</button>
+                <button class="toggle-btn" id="tab-pb-findprayer" onclick="switchTab('pb', 'findprayer')">Find</button>
+            </div>
+
+            <!-- Saved Prayers -->
+            <div id="pb-savedprayers" class="list-container active">
+                <button class="primary" onclick="createRuleFromSelected()" style="width: 100%; margin-bottom: 20px;">Create Prayer Rule from Selected</button>
+                <div id="my-prayers-list"></div>
+            </div>
+
+            <!-- Prayer Rules -->
+            <div id="pb-prayerrules" class="list-container">
+                <div class="card" style="text-align: center; background: rgba(0,0,0,0.03);">
+                    <h3>Import Shared Prayer or Rule</h3>
+                    <input type="text" id="import-link-input" placeholder="Paste link here..." style="font-size: 1rem; padding: 10px;">
+                    <button class="primary" onclick="importFromPastedLink()">Import Link</button>
+                </div>
+                <h2>My Prayer Rules</h2>
+                <div id="my-rules-list"></div>
+            </div>
+
+            <!-- Add Manually -->
+            <div id="pb-addprayer" class="list-container">
+                <input type="text" id="new-prayer-title" placeholder="Prayer Title (e.g., Morning Offering)">
+                <textarea id="new-prayer-body" placeholder="Type or paste the prayer here..."></textarea>
+                <button class="primary" onclick="saveManualPrayer()">Save to Book</button>
+            </div>
+            
+            <!-- Find Prayer -->
+            <div id="pb-findprayer" class="list-container">
+                <input type="text" id="ai-prompt" placeholder="Search (e.g., Orthodox morning prayer...)" onkeypress="if(event.key==='Enter') searchAIPrayer()">
+                <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+                    <button class="primary" onclick="searchAIPrayer()" id="ai-search-btn">AI Search</button>
+                    <button onclick="searchGooglePrayer()">Google Search</button>
+                </div>
+                <p id="pb-api-warning" style="font-size: 0.75rem; color: var(--text-light); margin-top: 10px; display: none;">*AI Search requires an API Key in Settings.</p>
+                
+                <div id="ai-results" style="margin-top: 20px; display: none;" class="card">
+                    <h3 id="ai-res-title">Title</h3>
+                    <p id="ai-res-body" class="serif-text" style="font-size:1.2rem; margin-bottom:15px; white-space:pre-wrap;"></p>
+                    <button class="primary" onclick="importAIPrayer()">Import to Prayer Book</button>
+                    <button onclick="verifyGoogle()">Verify on Google</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- 5. CHECKLIST -->
+        <main id="view-checklist" class="section">
+            <h1>Checklist</h1>
+            <div class="toggle-container">
+                <button class="toggle-btn active" id="tab-checklist-tasks" onclick="switchTab('checklist', 'tasks')">Tasks</button>
+                <button class="toggle-btn" id="tab-checklist-habits" onclick="switchTab('checklist', 'habits')">Habits</button>
+                <button class="toggle-btn" id="tab-checklist-gratitude" onclick="switchTab('checklist', 'gratitude')">Gratitude</button>
+            </div>
+            
+            <div id="checklist-tasks" class="list-container active">
+                <input type="text" id="todo-input" placeholder="Add a new task..." onkeypress="if(event.key==='Enter') addTodo()">
+                <button onclick="addTodo()">Add Task</button>
+                <div id="todo-list" style="margin-top: 25px;"></div>
+            </div>
+            
+            <div id="checklist-habits" class="list-container">
+                <input type="text" id="habit-input" placeholder="Add a daily habit..." onkeypress="if(event.key==='Enter') addHabit()">
+                <button onclick="addHabit()">Add Habit</button>
+                <div id="habit-list" style="margin-top: 25px;"></div>
+            </div>
+            
+            <div id="checklist-gratitude" class="list-container">
+                <p class="subtitle" style="margin-bottom:15px; font-size:1rem;">These boxes reset daily at midnight.</p>
+                <input type="text" id="g1" placeholder="1. I am grateful for..." oninput="saveGratitude()">
+                <input type="text" id="g2" placeholder="2. I am grateful for..." oninput="saveGratitude()">
+                <input type="text" id="g3" placeholder="3. I am grateful for..." oninput="saveGratitude()">
+                <input type="text" id="g4" placeholder="4. I am grateful for..." oninput="saveGratitude()">
+                <input type="text" id="g5" placeholder="5. I am grateful for..." oninput="saveGratitude()">
+            </div>
+        </main>
+
+        <!-- 6. FOCUS -->
+        <main id="view-focus" class="section">
+            <h1>Focus</h1>
+            <div class="toggle-container">
+                <button class="toggle-btn active" id="tab-focus-timer" onclick="switchTab('focus', 'timer')">Timer</button>
+                <button class="toggle-btn" id="tab-focus-breathe" onclick="switchTab('focus', 'breathe')">Breathing</button>
+            </div>
+            
+            <div id="focus-timer" class="list-container active">
+                <div style="margin-bottom: 10px;">
+                    <button onclick="setTimer(25)">25 Min Focus</button>
+                    <button onclick="setTimer(5)">5 Min Break</button>
+                </div>
+                <div class="timer-display" id="timer-text">25:00</div>
+                <button class="primary" onclick="toggleTimer()" id="timer-btn">Start Focus</button>
+                <button onclick="resetTimer()">Reset</button>
+            </div>
+            
+            <div id="focus-breathe" class="list-container">
+                <p class="subtitle" style="font-size:1rem;">4-7-8 Breathing to find your center.</p>
+                <div class="breathe-container"><div id="breathe-circle" class="circle">Ready</div></div>
+                <button class="primary" onclick="startBreathing()" id="breathe-btn" style="margin-top:20px;">Start Breathing</button>
+            </div>
+        </main>
+
+        <!-- 7. SHARE / DOWNLOAD -->
+        <main id="view-share" class="section">
+            <h1>Share App</h1>
+            <p class="serif-text" style="margin-bottom:20px;">Send this app to a friend so they can build their own daily dashboard.</p>
+            <button class="primary" onclick="nativeShare()" style="font-size: 1rem; padding: 12px 25px;">Share Link</button>
+            
+            <div style="margin-top: 30px;">
+                <p class="subtitle" style="margin-bottom: 10px;">Or scan QR Code:</p>
+                <img id="qr-code" src="" alt="QR Code" style="border-radius: 10px; margin-bottom: 20px;">
+            </div>
+
+            <div class="card" style="margin-top: 20px; text-align: left;">
+                <h3 style="text-align: center;">Install & Download</h3>
+                <p class="serif-text" style="font-size: 1.1rem; margin-bottom: 10px;">
+                    <strong>On Mobile:</strong> Tap your browser's share/options menu and select <em>"Add to Home Screen"</em> to install this tool directly to your device like an app.
+                </p>
+                <p class="serif-text" style="font-size: 1.1rem; margin-bottom: 15px;">
+                    <strong>On Desktop (or Backup):</strong> You can download this entire app as a single file to keep forever and use offline.
+                </p>
+                <button class="primary" onclick="downloadHTMLFile()" style="width: 100%;">Download Offline App File</button>
+            </div>
+        </main>
+
+        <!-- 8. SETTINGS -->
+        <main id="view-settings" class="section">
+            <h1>Settings & Data</h1>
+            
+            <div class="card">
+                <h3>App Theme</h3>
+                <select id="theme-selector" onchange="changeTheme()" style="margin-top: 10px; padding: 8px;">
+                    <option value="light">Light Theme (Default)</option>
+                    <option value="dark">Dark Theme</option>
+                    <option value="wood">Wood Theme (Gold & Red)</option>
+                </select>
+            </div>
+
+            <div class="card">
+                <h3>Gemini AI API Key</h3>
+                <input type="password" id="api-key-input" placeholder="Paste your API key here...">
+                <button class="primary" onclick="saveAPIKey()">Save Key</button>
+            </div>
+
+            <div class="card">
+                <h3>Data Management</h3>
+                <button onclick="exportData()">Export Backup</button>
+                <button onclick="document.getElementById('import-file').click()">Import Backup</button>
+                <input type="file" id="import-file" style="display:none;" onchange="importData(event)">
+                <br><br>
+                <button onclick="if(confirm('Are you sure you want to delete ALL data?')) { localStorage.clear(); location.reload(); }" style="color:var(--text-light); border-color:var(--text-light); margin-top:10px;">Clear All Data</button>
+            </div>
+            
+            <h2>How To & Tutorials</h2>
+            <button class="accordion">How do I get an AI API Key?</button>
+            <div class="panel"><p>1. Go to <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--accent);">Google AI Studio</a>.<br>2. Sign in with your Google account.<br>3. Click "Create API Key" and copy the long password.<br>4. Paste it into the Settings box above.</p></div>
+        </main>
+
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="nav-bar">
+        <div class="nav-item active" onclick="nav('home')"><span>🕊️</span>Home</div>
+        <div class="nav-item" onclick="nav('verse')"><span>📖</span>Verse</div>
+        <div class="nav-item" onclick="nav('readings')"><span>📚</span>Daily Reading</div>
+        <div class="nav-item" onclick="nav('prayerbook')"><span>📓</span>Prayer Book</div>
+        <div class="nav-item" onclick="nav('checklist')"><span>✓</span>Checklist</div>
+        <div class="nav-item" onclick="nav('focus')"><span>⏱️</span>Focus</div>
+        <div class="nav-item" onclick="nav('share')"><span>📤</span>Share</div>
+        <div class="nav-item" onclick="nav('settings')"><span>⚙️</span>Settings</div>
+    </nav>
+
+    <script>
+        // --- Core Navigation ---
+        function nav(viewId) {
+            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('view-' + viewId).classList.add('active');
+            event.currentTarget.classList.add('active');
+            if(viewId !== 'focus') stopBreathing();
+            if(viewId === 'share') { document.getElementById('qr-code').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.href.split('?')[0])}`; }
+        }
+        
+        function switchTab(group, tab) {
+            const containerId = group === 'pb' ? 'prayerbook' : group === 'v' ? 'verse' : group;
+            const container = document.getElementById('view-' + containerId);
+            container.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+            container.querySelectorAll('.list-container').forEach(list => list.classList.remove('active'));
+            document.getElementById(`tab-${group}-${tab}`).classList.add('active');
+            document.getElementById(`${group}-${tab}`).classList.add('active');
+            
+            if(group==='pb' && tab==='savedprayers') renderMyPrayers();
+            if(group==='pb' && tab==='prayerrules') renderRules();
+        }
+
+        var acc = document.getElementsByClassName("accordion");
+        for (let i = 0; i < acc.length; i++) {
+            acc[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var panel = this.nextElementSibling;
+                if (panel.style.maxHeight) { panel.style.maxHeight = null; } 
+                else { panel.style.maxHeight = panel.scrollHeight + "px"; }
+            });
+        }
+
+        function checkDailyReset() {
+            const today = new Date().toDateString();
+            const lastOpened = localStorage.getItem('lastOpenedDate');
+            if (today !== lastOpened) {
+                for(let i=1; i<=5; i++) localStorage.removeItem('g'+i);
+                localStorage.setItem('lastOpenedDate', today);
+            }
+            document.getElementById('devo-date').innerText = today + " Reflection";
+        }
+
+        // --- Theme System ---
+        function changeTheme() {
+            const theme = document.getElementById('theme-selector').value;
+            document.body.classList.remove('dark-theme', 'wood-theme');
+            if (theme === 'dark') document.body.classList.add('dark-theme');
+            if (theme === 'wood') document.body.classList.add('wood-theme');
+            localStorage.setItem('appTheme', theme);
+        }
+
+        function loadTheme() {
+            const theme = localStorage.getItem('appTheme') || 'light';
+            document.getElementById('theme-selector').value = theme;
+            changeTheme();
+        }
+
+        // --- Download App System ---
+        async function downloadHTMLFile() {
+            try {
+                // Fetch the clean original HTML from the URL
+                const res = await fetch(window.location.href.split('?')[0]);
+                const text = await res.text();
+                triggerDownload(text);
+            } catch (e) {
+                // If fetch fails (like if they are already fully offline), dump the current DOM state
+                const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+                triggerDownload(htmlContent);
+            }
+        }
+        
+        function triggerDownload(content) {
+            const blob = new Blob([content], {type: 'text/html'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = "My_Daily_Peace.html";
+            a.click();
+        }
+
+        // --- API Settings ---
+        function getAPIKey() { return localStorage.getItem('geminiAPIKey'); }
+        function saveAPIKey() { 
+            localStorage.setItem('geminiAPIKey', document.getElementById('api-key-input').value.trim()); 
+            alert("API Key saved."); checkAPIKeyWarnings(); 
+        }
+        function checkAPIKeyWarnings() {
+            const hasKey = !!getAPIKey();
+            document.getElementById('pb-api-warning').style.display = hasKey ? 'none' : 'block';
+            document.getElementById('verse-api-warning').style.display = hasKey ? 'none' : 'block';
+        }
+
+        // --- SMART AI HELPER ---
+        async function fetchFromGemini(prompt, sysInstruction) {
+            const key = getAPIKey();
+            if(!key) return null;
+            
+            try {
+                const modelsRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+                const modelsData = await modelsRes.json();
+
+                if (modelsData.error) {
+                    alert("API Key Error: " + modelsData.error.message);
+                    return null;
+                }
+
+                const validModels = modelsData.models.filter(m => 
+                    m.name.includes("gemini") && !m.name.includes("tts") &&
+                    !m.name.includes("audio") && !m.name.includes("vision") && !m.name.includes("embedding")
+                );
+
+                if (validModels.length === 0) {
+                    alert("Error: Your API key does not have access to any standard text models.");
+                    return null;
+                }
+
+                const preferred = ["gemini-3.6-flash", "gemini-3.0-flash", "gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"];
+                
+                let modelsToTry = [];
+                for (let pref of preferred) {
+                    const found = validModels.find(m => m.name === `models/${pref}` || m.name === pref);
+                    if (found) modelsToTry.push(found.name);
+                }
+                
+                if (modelsToTry.length === 0) modelsToTry = validModels.map(m => m.name).slice(0, 3);
+
+                let lastError = "";
+
+                for (let modelName of modelsToTry) {
+                    const modelNameForUrl = modelName.startsWith('models/') ? modelName.split('/')[1] : modelName;
+                    
+                    try {
+                        let responseText = null;
+                        if (modelNameForUrl.includes("2.5") || modelNameForUrl.includes("3.")) {
+                            const payload = { model: modelNameForUrl, input: sysInstruction + "\n\nUser Request: " + prompt };
+                            const generateRes = await fetch(`https://generativelanguage.googleapis.com/v1beta2/interactions?key=${key}`, {
+                                method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload)
+                            });
+                            const generateData = await generateRes.json();
+                            if (!generateData.error && generateData.steps) {
+                                const outputs = generateData.steps.filter(s => s.type === "model_output");
+                                if (outputs.length > 0) responseText = outputs[outputs.length - 1].content[0].text;
+                            } else if (generateData.error) { lastError = generateData.error.message; }
+                        } else {
+                            const payload = { contents: [{ parts: [{ text: sysInstruction + "\n\nUser Request: " + prompt }] }] };
+                            const generateRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelNameForUrl}:generateContent?key=${key}`, {
+                                method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload)
+                            });
+                            const generateData = await generateRes.json();
+                            if (!generateData.error && generateData.candidates) { responseText = generateData.candidates[0].content.parts[0].text;
+                            } else if (generateData.error) { lastError = generateData.error.message; }
+                        }
+                        if (responseText) return responseText.replace(/\*/g, '');
+                    } catch (e) { lastError = e.message; }
+                }
+                alert("Generation Error: All available models failed. Last error: " + lastError);
+                return null;
+            } catch (error) {
+                alert("Network Error: " + error.message); return null;
+            }
+        }
+
+        // --- Verse Tab ---
+        const otBooks = ["Genesis", "Exodus", "Deuteronomy", "Joshua", "Isaiah", "Jeremiah", "Ezekiel", "Daniel"];
+        const ntBooks = ["Matthew", "Mark", "Luke", "John", "Acts", "Romans", "Revelation"];
+        
+        async function fetchVerseFromAPI(reference) {
+            const textEl = document.getElementById('verse-text'); const refEl = document.getElementById('verse-ref'); const linkCont = document.getElementById('verse-link-container');
+            textEl.innerHTML = "<em>Seeking a verse...</em>"; refEl.innerText = ""; linkCont.innerHTML = "";
+            try {
+                const response = await fetch(`https://bible-api.com/${encodeURIComponent(reference)}?translation=kjv`);
+                const data = await response.json();
+                const displayVerse = data.verses ? data.verses[0].text : data.text;
+                const displayRef = data.verses ? `${data.verses[0].book_name} ${data.verses[0].chapter}:${data.verses[0].verse}` : data.reference;
+                
+                const chapterRef = displayRef.split(':')[0];
+                textEl.innerHTML = `"${displayVerse.trim()}"`; refEl.innerText = displayRef;
+                const bgLink = `https://www.biblegateway.com/passage/?search=${encodeURIComponent(chapterRef)}&version=KJV`;
+                linkCont.innerHTML = `<a href="${bgLink}" target="_blank" class="link-btn">Read Full Chapter</a>`;
+            } catch (error) { textEl.innerHTML = "<em>Could not reach the web right now.</em>"; }
+        }
+        
+        function generateRandomVerse() {
+            let book = document.getElementById('verse-book').value;
+            let chapter = 1;
+            if(book === "Psalms") { chapter = Math.floor(Math.random() * 150) + 1; book = "Psalms"; }
+            else if(book === "Proverbs") { chapter = Math.floor(Math.random() * 31) + 1; book = "Proverbs"; }
+            else if(book === "OT") { book = otBooks[Math.floor(Math.random()*otBooks.length)]; chapter = Math.floor(Math.random() * 10) + 1; }
+            else if(book === "NT") { book = ntBooks[Math.floor(Math.random()*ntBooks.length)]; chapter = Math.floor(Math.random() * 10) + 1; }
+            fetchVerseFromAPI(`${book} ${chapter}:1`);
+        }
+
+        async function generateAIVerse() {
+            const key = getAPIKey(); const prompt = document.getElementById('verse-ai-prompt').value;
+            if(!key) { alert("Please enter your Gemini API key in Settings first."); return; }
+            if(!prompt) return;
+            
+            document.getElementById('verse-text').innerHTML = "<em>Consulting AI...</em>";
+            const sysInstruction = "Find exactly one KJV Bible verse for the user's situation. Format exactly:\nREF: [Book Chapter:Verse]\nBODY: [Text]\nNo markdown, no other text.";
+            
+            const text = await fetchFromGemini(prompt, sysInstruction);
+            if (!text) {
+                document.getElementById('verse-text').innerHTML = "<em>Search failed. Check API Key.</em>"; return;
+            }
+            const refMatch = text.match(/REF:\s*(.*)/i); 
+            const bodyMatch = text.match(/BODY:\s*([\s\S]*)/i);
+            
+            if(refMatch && bodyMatch) {
+                const ref = refMatch[1].trim(); const bodyText = bodyMatch[1].trim();
+                const chapterRef = ref.split(':')[0];
+                document.getElementById('verse-text').innerHTML = `"${bodyText}"`; document.getElementById('verse-ref').innerText = ref;
+                const bgLink = `https://www.biblegateway.com/passage/?search=${encodeURIComponent(chapterRef)}&version=KJV`;
+                document.getElementById('verse-link-container').innerHTML = `<a href="${bgLink}" target="_blank" class="link-btn">Read Full Chapter</a>`;
+            } else { document.getElementById('verse-text').innerHTML = "<em>Failed to parse AI response. Try again.</em>"; }
+        }
+
+        function searchGoogleVerse() {
+            const prompt = document.getElementById('verse-ai-prompt').value;
+            if(!prompt) { alert("Please type a topic to search for."); return; }
+            window.open(`https://www.google.com/search?q=${encodeURIComponent("bible verse about " + prompt)}`, "_blank");
+        }
+
+        // --- Daily Readings ---
+        function getDayOfYear() {
+            const now = new Date(); const start = new Date(now.getFullYear(), 0, 0);
+            return Math.floor((now - start) / (1000 * 60 * 60 * 24));
+        }
+        function generateOSBPlan() {
+            const doy = getDayOfYear();
+            const otBook = (doy < 50) ? "Genesis" : (doy < 90) ? "Exodus" : (doy < 120) ? "Leviticus" : (doy < 150) ? "Numbers" : (doy < 180) ? "Deuteronomy" : (doy < 210) ? "Joshua" : (doy < 240) ? "Judges" : (doy < 270) ? "1 Kingdoms" : (doy < 300) ? "2 Kingdoms" : (doy < 330) ? "Sirach" : "Isaiah";
+            const otChap = (doy % 30) + 1;
+            const ntBook = (doy < 90) ? "Matthew" : (doy < 180) ? "Mark" : (doy < 270) ? "Luke" : "John";
+            const ntChap = (doy % 20) + 1;
+            const psalm = (doy % 150) + 1;
+            const dailyPlanString = `${otBook} ${otChap}; Psalm ${psalm}; ${ntBook} ${ntChap}`;
+            document.getElementById('daily-plan-text').innerText = dailyPlanString;
+            document.getElementById('daily-plan-link').href = `https://www.biblegateway.com/passage/?search=${encodeURIComponent(dailyPlanString)}&version=NRSVCE`;
+        }
+
+        const bibleBooks = {
+            ot: [ {n:"Genesis", c:50}, {n:"Exodus", c:40}, {n:"Leviticus", c:27}, {n:"Numbers", c:36}, {n:"Deuteronomy", c:34}, {n:"Joshua", c:24}, {n:"Judges", c:21}, {n:"Ruth", c:4}, {n:"1 Samuel", c:31}, {n:"2 Samuel", c:24}, {n:"1 Kings", c:22}, {n:"2 Kings", c:25}, {n:"1 Chronicles", c:29}, {n:"2 Chronicles", c:36}, {n:"Ezra", c:10}, {n:"Nehemiah", c:13}, {n:"Esther", c:10}, {n:"Job", c:42}, {n:"Psalms", c:150}, {n:"Proverbs", c:31}, {n:"Ecclesiastes", c:12}, {n:"Song of Solomon", c:8}, {n:"Isaiah", c:66}, {n:"Jeremiah", c:52}, {n:"Lamentations", c:5}, {n:"Ezekiel", c:48}, {n:"Daniel", c:12}, {n:"Hosea", c:14}, {n:"Joel", c:3}, {n:"Amos", c:9}, {n:"Obadiah", c:1}, {n:"Jonah", c:4}, {n:"Micah", c:7}, {n:"Nahum", c:3}, {n:"Habakkuk", c:3}, {n:"Zephaniah", c:3}, {n:"Haggai", c:2}, {n:"Zechariah", c:14}, {n:"Malachi", c:4} ],
+            dc: [ {n:"Tobit", c:14}, {n:"Judith", c:16}, {n:"Wisdom", c:19}, {n:"Sirach", c:51}, {n:"Baruch", c:6}, {n:"1 Maccabees", c:16}, {n:"2 Maccabees", c:15}, {n:"3 Maccabees", c:7} ],
+            nt: [ {n:"Matthew", c:28}, {n:"Mark", c:16}, {n:"Luke", c:24}, {n:"John", c:21}, {n:"Acts", c:28}, {n:"Romans", c:16}, {n:"1 Corinthians", c:16}, {n:"2 Corinthians", c:13}, {n:"Galatians", c:6}, {n:"Ephesians", c:6}, {n:"Philippians", c:4}, {n:"Colossians", c:4}, {n:"1 Thessalonians", c:5}, {n:"2 Thessalonians", c:3}, {n:"1 Timothy", c:6}, {n:"2 Timothy", c:4}, {n:"Titus", c:3}, {n:"Philemon", c:1}, {n:"Hebrews", c:13}, {n:"James", c:5}, {n:"1 Peter", c:5}, {n:"2 Peter", c:3}, {n:"1 John", c:5}, {n:"2 John", c:1}, {n:"3 John", c:1}, {n:"Jude", c:1}, {n:"Revelation", c:22} ]
+        };
+        let bibleProgress = JSON.parse(localStorage.getItem('bibleProgress') || '{}');
+        function renderBibleTracker() {
+            ['ot', 'dc', 'nt'].forEach(section => {
+                let html = '';
+                bibleBooks[section].forEach(book => {
+                    html += `<details style="margin-bottom:10px; background:rgba(0,0,0,0.03); border-radius:8px; padding:5px;"><summary style="font-family:'Montserrat', sans-serif; cursor:pointer; font-weight:500; list-style:none;">${book.n}</summary><div style="padding-left:10px; margin-top:10px; display:flex; flex-wrap:wrap; gap:10px;">`;
+                    for(let i=1; i<=book.c; i++) {
+                        const id = `${book.n}-${i}`; const checked = bibleProgress[id] ? "checked" : "";
+                        const link = `https://www.biblegateway.com/passage/?search=${book.n}+${i}&version=NRSVCE`;
+                        html += `<div style="display:flex; align-items:center; background:rgba(255,255,255,0.7); padding:4px 8px; border-radius:6px; border:1px solid rgba(0,0,0,0.1);">
+                            <input type="checkbox" ${checked} onchange="toggleBible('${id}', this.checked)" style="width:16px; height:16px; margin-right:5px; accent-color:var(--text-main);">
+                            <span style="font-family:'Cormorant Garamond', serif; font-size:1.1rem; width:20px;">${i}</span>
+                            <a href="${link}" target="_blank" style="text-decoration:none; margin-left:5px;">📖</a>
+                        </div>`;
+                    }
+                    html += `</div></details>`;
+                });
+                document.getElementById(`${section}-tracker`).innerHTML = html;
+            });
+        }
+        function toggleBible(id, state) { bibleProgress[id] = state; localStorage.setItem('bibleProgress', JSON.stringify(bibleProgress)); }
+
+        let devoArchive = JSON.parse(localStorage.getItem('devoArchive') || '[]');
+        function saveDevo() {
+            const q = document.getElementById('devo-quote').value; const r = document.getElementById('devo-reflect').value; const a = document.getElementById('devo-apply').value;
+            if(!q && !r && !a) return;
+            devoArchive.unshift({ date: new Date().toDateString(), q, r, a });
+            localStorage.setItem('devoArchive', JSON.stringify(devoArchive));
+            alert("Entry Saved."); document.getElementById('devo-quote').value=''; document.getElementById('devo-reflect').value=''; document.getElementById('devo-apply').value='';
+        }
+        function viewDevoArchive() {
+            const list = document.getElementById('devo-archive-list'); list.innerHTML = ''; list.style.display = 'block';
+            devoArchive.forEach(d => {
+                list.innerHTML += `<div class="card"><h3 style="font-size:0.8rem;">${d.date}</h3>
+                <p class="serif-text"><strong>Quote:</strong> ${d.q}</p><p class="serif-text"><strong>Reflect:</strong> ${d.r}</p><p class="serif-text"><strong>Apply:</strong> ${d.a}</p></div>`;
+            });
+        }
+
+        // --- Prayer Book Logic ---
+        let myPrayers = JSON.parse(localStorage.getItem('myPrayers') || '[]');
+        let prayerRules = JSON.parse(localStorage.getItem('prayerRules') || '[]');
+
+        function renderMyPrayers() {
+            const list = document.getElementById('my-prayers-list'); list.innerHTML = '';
+            myPrayers.forEach((p, i) => {
+                const escapedBody = p.body.replace(/'/g, "\\'");
+                list.innerHTML += `
+                <div class="card list-item" style="display:block;">
+                    <div style="display:flex; align-items:center; margin-bottom:10px;">
+                        <input type="checkbox" id="share-cb-${i}" class="share-checkbox">
+                        <h3 style="margin:0; flex-grow:1;">${p.title}</h3>
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <button onclick="readAloud('${escapedBody}')" style="padding:5px 10px; font-size:0.7rem;">🔊 Listen</button>
+                        <button onclick="shareSinglePrayer(${i})" style="padding:5px 10px; font-size:0.7rem;">📤 Share</button>
+                        <button class="delete-btn" onclick="deletePrayer(${i})" style="padding:5px 10px;">×</button>
+                    </div>
+                    <p class="serif-text" style="font-size:1.2rem; white-space:pre-wrap;">${p.body}</p>
+                </div>`;
+            });
+            localStorage.setItem('myPrayers', JSON.stringify(myPrayers));
+        }
+
+        function createRuleFromSelected() {
+            const checkboxes = document.querySelectorAll('.share-checkbox'); 
+            let selectedPrayers = [];
+            checkboxes.forEach((cb, i) => { if(cb.checked) selectedPrayers.push(myPrayers[i]); });
+            
+            if(selectedPrayers.length === 0) return alert("Select at least one prayer to create a rule.");
+            
+            const ruleName = prompt("Enter a name for this Prayer Rule (e.g., Morning Rule):");
+            if(!ruleName) return;
+            
+            prayerRules.push({ ruleName: ruleName, prayers: selectedPrayers });
+            localStorage.setItem('prayerRules', JSON.stringify(prayerRules));
+            
+            checkboxes.forEach(cb => cb.checked = false); // clear checks
+            
+            alert("Prayer Rule created!"); switchTab('pb', 'prayerrules');
+        }
+
+        function renderRules() {
+            const list = document.getElementById('my-rules-list'); list.innerHTML = '';
+            if (prayerRules.length === 0) { list.innerHTML = `<p class="serif-text" style="opacity:0.7; margin-top:20px;">No rules yet. Select prayers from 'My Prayers' to create one!</p>`; return; }
+            
+            prayerRules.forEach((r, i) => {
+                let textConcat = r.prayers.map(p => `<strong>${p.title}</strong><br>${p.body}`).join('<br><br>');
+                let plainText = r.prayers.map(p => p.body).join('. ').replace(/'/g, "\\'");
+                
+                list.innerHTML += `
+                <details class="card" style="margin-bottom:10px; padding:15px; cursor:pointer;">
+                    <summary style="font-family:'Montserrat', sans-serif; font-size:0.95rem; font-weight:600; display:flex; justify-content:space-between; align-items:center; list-style:none;">
+                        <span>${r.ruleName} (${r.prayers.length})</span><span style="font-size:0.8rem; opacity:0.5;">▼</span>
+                    </summary>
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); cursor:default;">
+                        <div style="margin-bottom:15px;">
+                           <button onclick="shareRule(${i})" style="font-size:0.7rem; padding:6px 12px;">📤 Share Rule</button>
+                           <button onclick="readAloud('${plainText}')" style="font-size:0.7rem; padding:6px 12px;">🔊 Listen</button>
+                           <button onclick="deleteRule(${i})" style="font-size:0.7rem; padding:6px 12px; color:var(--text-main);">❌ Delete</button>
+                        </div>
+                        <p class="serif-text" style="font-size:1.2rem; white-space:pre-wrap;">${textConcat}</p>
+                    </div>
+                </details>`;
+            });
+        }
+        
+        function deleteRule(i) { if(confirm("Delete this rule?")) { prayerRules.splice(i, 1); localStorage.setItem('prayerRules', JSON.stringify(prayerRules)); renderRules(); } }
+
+        function saveManualPrayer() {
+            const title = document.getElementById('new-prayer-title').value; const body = document.getElementById('new-prayer-body').value;
+            if(!title || !body) return alert("Please enter a title and prayer.");
+            myPrayers.push({title, body}); document.getElementById('new-prayer-title').value = ''; document.getElementById('new-prayer-body').value = '';
+            renderMyPrayers(); switchTab('pb', 'savedprayers');
+        }
+        function deletePrayer(i) { if(confirm("Remove this prayer?")) { myPrayers.splice(i, 1); renderMyPrayers(); } }
+        
+        function readAloud(text) { window.speechSynthesis.cancel(); const utterance = new SpeechSynthesisUtterance(text); utterance.rate = 0.9; window.speechSynthesis.speak(utterance); }
+
+        // --- Sharing & Importing via Links ---
+        function generateMagicLink(payload) { return window.location.href.split('?')[0] + "?rule=" + btoa(encodeURIComponent(JSON.stringify(payload))); }
+        function executeShare(url, titleText) { if (navigator.share) { navigator.share({ title: titleText, url: url }); } else { prompt("Copy this link to share:", url); } }
+        function shareSinglePrayer(i) { const p = myPrayers[i]; executeShare(generateMagicLink({ type: 'single', data: p }), `Share Prayer: ${p.title}`); }
+        function shareRule(i) { const r = prayerRules[i]; executeShare(generateMagicLink({ type: 'rule', ruleName: r.ruleName, data: r.prayers }), `Share Prayer Rule: ${r.ruleName}`); }
+
+        function processImportedData(payload) {
+            let wasImported = false;
+            if (payload.type === 'single') {
+                if (!myPrayers.some(existing => existing.title === payload.data.title && existing.body === payload.data.body)) { myPrayers.push(payload.data); wasImported = true; }
+                alert(`Imported prayer: ${payload.data.title}`);
+            } 
+            else if (payload.type === 'rule') {
+                prayerRules.push({ ruleName: payload.ruleName, prayers: payload.data });
+                let addedCount = 0;
+                payload.data.forEach(p => { if (!myPrayers.some(existing => existing.title === p.title && existing.body === p.body)) { myPrayers.push(p); addedCount++; } });
+                alert(`Imported rule: "${payload.ruleName}"\nAdded ${addedCount} new individual prayers to 'My Prayers'.`); wasImported = true;
+            } 
+            else if (Array.isArray(payload)) { 
+                prayerRules.push({ ruleName: "Shared Rule", prayers: payload });
+                payload.forEach(p => { if (!myPrayers.some(existing => existing.title === p.title && existing.body === p.body)) { myPrayers.push(p); } });
+                alert("Imported legacy prayer rule."); wasImported = true;
+            }
+            if (wasImported) { localStorage.setItem('myPrayers', JSON.stringify(myPrayers)); localStorage.setItem('prayerRules', JSON.stringify(prayerRules)); renderMyPrayers(); renderRules(); }
+        }
+
+        function importFromPastedLink() {
+            const link = document.getElementById('import-link-input').value.trim();
+            if(!link) return alert("Please paste a link first.");
+            try {
+                const url = new URL(link); const encoded = url.searchParams.get('rule');
+                if (encoded) { processImportedData(JSON.parse(decodeURIComponent(atob(encoded)))); document.getElementById('import-link-input').value = ''; } 
+                else { alert("No imported data found in that URL."); }
+            } catch(e) { alert("Invalid link format. Please make sure to copy the entire link."); }
+        }
+
+        function checkMagicLink() {
+            const params = new URLSearchParams(window.location.search);
+            if(params.has('rule')) {
+                try {
+                    const decoded = JSON.parse(decodeURIComponent(atob(params.get('rule'))));
+                    if(confirm("Someone shared a Prayer/Rule with you! Import it to your book?")) { processImportedData(decoded); nav('prayerbook'); }
+                } catch(e) { alert("Invalid or broken sharing link."); }
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+
+        // --- Find Prayers (AI + Google) ---
+        let currentAIPrayerTitle = ""; let currentAIPrayerBody = "";
+        
+        function searchGooglePrayer() {
+            const prompt = document.getElementById('ai-prompt').value;
+            if(!prompt) { alert("Please type a prayer to search for."); return; }
+            window.open(`https://www.google.com/search?q=${encodeURIComponent(prompt + " traditional prayer text")}`, "_blank");
+        }
+
+        async function searchAIPrayer() {
+            const key = getAPIKey(); const prompt = document.getElementById('ai-prompt').value;
+            if(!key) { alert("Please enter your Gemini API key in Settings to use the AI search."); return; }
+            if(!prompt) return;
+            
+            document.getElementById('ai-search-btn').innerText = "Searching...";
+            const sysInstruction = "You are a classic prayer library. Provide the traditional prayer requested. Format exactly:\nTITLE: [Name]\nBODY: [Text]\nNo markdown, no other text.";
+            
+            const text = await fetchFromGemini(prompt, sysInstruction);
+            if (!text) { document.getElementById('ai-search-btn').innerText = "AI Search"; return; }
+
+            const titleMatch = text.match(/TITLE:\s*(.*)/i); 
+            const bodyMatch = text.match(/BODY:\s*([\s\S]*)/i);
+            
+            currentAIPrayerTitle = titleMatch ? titleMatch[1].trim() : "Found Prayer"; 
+            currentAIPrayerBody = bodyMatch ? bodyMatch[1].trim() : text;
+            
+            document.getElementById('ai-res-title').innerText = currentAIPrayerTitle; document.getElementById('ai-res-body').innerText = currentAIPrayerBody;
+            document.getElementById('ai-results').style.display = "block"; document.getElementById('ai-search-btn').innerText = "AI Search";
+        }
+        function importAIPrayer() { myPrayers.push({title: currentAIPrayerTitle, body: currentAIPrayerBody}); renderMyPrayers(); alert("Saved to Prayer Book!"); switchTab('pb', 'savedprayers'); }
+        function verifyGoogle() { window.open(`https://www.google.com/search?q=${encodeURIComponent(currentAIPrayerTitle + " text")}`, "_blank"); }
+
+        // --- Checklist ---
+        let todos = JSON.parse(localStorage.getItem('todos') || '[]');
+        function renderTodos() {
+            const list = document.getElementById('todo-list'); list.innerHTML = '';
+            todos.forEach((t, i) => { list.innerHTML += `<div class="list-item ${t.done ? 'done' : ''}"><input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTodo(${i})"><span>${t.text}</span><button class="delete-btn" onclick="deleteTodo(${i})">×</button></div>`; });
+            localStorage.setItem('todos', JSON.stringify(todos));
+        }
+        function addTodo() { const input = document.getElementById('todo-input'); if(input.value.trim() === '') return; todos.push({ text: input.value, done: false }); input.value = ''; renderTodos(); }
+        function toggleTodo(i) { todos[i].done = !todos[i].done; renderTodos(); } function deleteTodo(i) { todos.splice(i, 1); renderTodos(); }
+
+        let habits = JSON.parse(localStorage.getItem('habits') || '[]');
+        function renderHabits() {
+            const list = document.getElementById('habit-list'); list.innerHTML = '';
+            habits.forEach((h, i) => { list.innerHTML += `<div class="list-item ${h.done ? 'done' : ''}"><input type="checkbox" ${h.done ? 'checked' : ''} onchange="toggleHabit(${i})"><span>${h.name}</span><button class="delete-btn" onclick="deleteHabit(${i})">×</button></div>`; });
+            localStorage.setItem('habits', JSON.stringify(habits));
+        }
+        function addHabit() { const input = document.getElementById('habit-input'); if(input.value.trim() === '') return; habits.push({ name: input.value, done: false }); input.value = ''; renderHabits(); }
+        function toggleHabit(i) { habits[i].done = !habits[i].done; renderHabits(); } function deleteHabit(i) { habits.splice(i, 1); renderHabits(); }
+
+        function loadGratitude() { for(let i=1; i<=5; i++) document.getElementById('g'+i).value = localStorage.getItem('g'+i) || ''; }
+        function saveGratitude() { for(let i=1; i<=5; i++) localStorage.setItem('g'+i, document.getElementById('g'+i).value); }
+
+        // --- Focus ---
+        let timeLeft = 1500; let timerId = null; let currentMode = 25;
+        function updateTimerDisplay() {
+            const m = Math.floor(timeLeft / 60).toString().padStart(2, '0'); const s = (timeLeft % 60).toString().padStart(2, '0');
+            document.getElementById('timer-text').innerText = `${m}:${s}`;
+        }
+        function setTimer(mins) {
+            clearInterval(timerId); timerId = null; currentMode = mins; timeLeft = mins * 60;
+            updateTimerDisplay(); document.getElementById('timer-btn').innerText = `Start ${mins === 25 ? 'Focus' : 'Break'}`;
+        }
+        function toggleTimer() {
+            const btn = document.getElementById('timer-btn');
+            if (timerId) { clearInterval(timerId); timerId = null; btn.innerText = "Resume"; } 
+            else { btn.innerText = "Pause"; timerId = setInterval(() => {
+                    if (timeLeft > 0) { timeLeft--; updateTimerDisplay(); } 
+                    else { clearInterval(timerId); timerId = null; alert("Time's up!"); setTimer(currentMode); }
+                }, 1000); }
+        }
+        function resetTimer() { setTimer(currentMode); }
+
+        let breatheInterval = null; let breatheState = 0; 
+        function startBreathing() {
+            const btn = document.getElementById('breathe-btn'); const circle = document.getElementById('breathe-circle');
+            if (breatheState === 1) { stopBreathing(); return; }
+            breatheState = 1; btn.innerText = "Stop";
+            function cycle() {
+                if(breatheState === 0) return; circle.innerText = "Inhale"; circle.style.transition = "transform 4s ease-out"; circle.style.transform = "scale(1.8)";
+                setTimeout(() => { if(breatheState === 0) return; circle.innerText = "Hold"; circle.style.transition = "none"; 
+                    setTimeout(() => { if(breatheState === 0) return; circle.innerText = "Exhale"; circle.style.transition = "transform 8s ease-in-out"; circle.style.transform = "scale(1)";
+                    }, 7000); }, 4000);
+            }
+            cycle(); breatheInterval = setInterval(cycle, 19000);
+        }
+        function stopBreathing() {
+            breatheState = 0; clearInterval(breatheInterval); const circle = document.getElementById('breathe-circle');
+            circle.innerText = "Ready"; circle.style.transition = "transform 0.5s ease"; circle.style.transform = "scale(1)";
+            document.getElementById('breathe-btn').innerText = "Start Breathing";
+        }
+
+        // --- Data Management ---
+        function nativeShare() {
+            if (navigator.share) { navigator.share({ title: 'My Daily Peace', url: window.location.href.split('?')[0] }); } 
+            else { prompt("Copy link:", window.location.href.split('?')[0]); }
+        }
+        function exportData() {
+            const data = JSON.stringify(localStorage); const blob = new Blob([data], {type: "text/plain"});
+            const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "peace_app_backup.txt"; a.click();
+        }
+        function importData(event) {
+            const file = event.target.files[0]; if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    for (let key in data) { localStorage.setItem(key, data[key]); }
+                    alert("Backup restored! Reloading app..."); location.reload();
+                } catch(err) { alert("Invalid backup file."); }
+            };
+            reader.readAsText(file);
+        }
+
+        // --- Init ---
+        document.getElementById('api-key-input').value = localStorage.getItem('geminiAPIKey') || '';
+        loadTheme(); checkAPIKeyWarnings(); checkDailyReset(); loadGratitude(); renderTodos(); renderHabits(); 
+        renderMyPrayers(); renderRules(); generateOSBPlan(); renderBibleTracker(); checkMagicLink();
+    </script>
+</body>
+</html>
